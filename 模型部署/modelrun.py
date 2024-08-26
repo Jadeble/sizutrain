@@ -217,60 +217,32 @@ class YOLOv8:
 class YOLOv8Runner:
     def __init__(self, model_path, conf_thres, iou_thres):
         """
-        初始化YOLOv8Runner类的实例。
+        初始化YOLOv8Runner类的实例，并进行模型预热。
         参数:
             model_path: ONNX模型的路径。
-            conf_thres: 过滤检测的置信度阈值。
-            iou_thres: 非极大抑制的IoU（交并比）阈值。
+            conf_thres: 置信度阈值。
+            iou_thres: IoU（交并比）阈值。
         """
         self.model_path = model_path
         self.conf_thres = conf_thres
         self.iou_thres = iou_thres
-        self.detection = None  # 初始化时不加载模型
+        self.detection = YOLOv8(self.model_path, self.conf_thres, self.iou_thres)
         self.video_capture = None
-        self.warmup_stage = 0  # 当前的预热阶段
 
-        # 定义类别组
-        self.group1 = ['1', '2', '3', '4', '5', '6', '7', '8']
-        self.group2 = ['high', 'normal', 'low']
+        # 进行模型预热
+        self.warmup()
 
-    def start_warmup(self):
+    def warmup(self):
         """
-        开始模型的分阶段预热，第一阶段。
+        进行模型预热，以便优化运行效率。
         """
-        if self.warmup_stage == 0:
-            print("Starting model warmup stage 1...")
-            self.detection = YOLOv8(self.model_path, self.conf_thres, self.iou_thres)
-            self.warmup_stage += 1
-
-    def continue_warmup(self):
-        """
-        继续模型的分阶段预热，根据当前阶段执行相应操作。
-        """
-        if self.warmup_stage == 1:
-            print("Warming up stage 2...")
-            dummy_frame = np.zeros((960, 960, 3), dtype=np.uint8)
-            self.detection.run(dummy_frame)
-            self.warmup_stage += 1
-
-        elif self.warmup_stage == 2:
-            print("Warming up stage 3...")
-            dummy_frame = np.zeros((960, 960, 3), dtype=np.uint8)
-            self.detection.run(dummy_frame)
-            self.warmup_stage += 1
-
-        elif self.warmup_stage == 3:
-            print("Warming up stage 4...")
-            dummy_frame = np.zeros((960, 960, 3), dtype=np.uint8)
-            self.detection.run(dummy_frame)
-            self.warmup_stage += 1
-            print("Model warmup complete.")
-
-    def is_warmup_complete(self):
-        """
-        检查预热是否完成。
-        """
-        return self.warmup_stage >= 4
+        print("Warming up the model...")
+        # 创建一个空的图像帧（与实际处理的图像大小相同）
+        dummy_frame = np.zeros((640, 640, 3), dtype=np.uint8)
+        # 运行几次模型推理
+        for _ in range(3):
+            _ = self.detection.run(dummy_frame)
+        print("Model warmup complete.")
 
     def load_camera(self, video_capture):
         """
@@ -380,16 +352,6 @@ if __name__ == "__main__":
     video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     # 打开摄像头
     model_runner.load_camera(video_capture)  # 默认摄像头
-    # 开始模型预热分阶段调用
-    model_runner.start_warmup()  # 第一次调用，启动预热
-    # 在主程序的其他部分中，你可以继续调用以下三次
-    model_runner.continue_warmup()  # 第二次调用，继续预热
-    model_runner.continue_warmup()  # 第三次调用，继续预热
-    model_runner.continue_warmup()  # 第四次调用，完成预热
-    if model_runner.is_warmup_complete():
-        print("Warmup complete, ready to process frames.")
-    # 等待用户输入或其他条件来处理下一帧
-
     start_time = time.time()
     most_common_group1, most_common_group2 = model_runner.detect_and_count(iterations=5)
     print(f"Most common in group 1: {most_common_group1}")

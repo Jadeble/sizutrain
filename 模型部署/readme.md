@@ -63,4 +63,4 @@ CUDA（Compute Unified Device Architecture）是NVIDIA推出的并行计算平�
 3. 使用CUDA进行推理时，如果在推理前后进行计时可以发现，推理一张960的图片需要6~8s的时间，对于后续运行仪表盘检测是很明显的时间浪费，但是若将设备手动指定为CPU时，会发现速度比使用CUDA更快，这不符合CUDA加速的结果，说明有了异常的时间占用。实际上是因为onnx平台在第一次加载模型时需要进行模型预热，这个预热的时间很长，那么在后续的仪表盘和数字识别中，必须让模型提前预热，方便更快的推理，参考代码`model.py`。
 
 ### 参考
-https://github.com/Jadeble/sizutrain.git
+[GitHub](https://github.com/Jadeble/sizutrain)

@@ -52,3 +52,5 @@ elif result_ckl == 24 or result_ckl == 16 or result_ckl == 8 or result_ckl == 12
 4. 踢球结束后，再次回归巡线状态，进行下一轮的判断
 
 ### 参考
+
+[GitHub](https://github.com/Jadeble/sizutrain)

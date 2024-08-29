@@ -88,4 +88,6 @@ ysc@ysc-desktop:~/Desktop/snowboy/swig/Python3$ cp snowboydetect.py _snowboydete
 7. 编写符合自己需求的唤醒脚本
 在demo.py的基础上进行修改，唤醒后会执行回调函数`interrupt_callback`，在该回调函数中可以编写自己需要的逻辑
 ### 参考资料
-https://blog.csdn.net/qq_38844263/article/details/127143725
+[CSDN](https://blog.csdn.net/qq_38844263/article/details/127143725)
+
+[GitHub](https://github.com/Jadeble/sizutrain)
